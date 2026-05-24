@@ -3,8 +3,10 @@ import json
 import re
 import os
 
-# Configure Gemini with fallback API key
-api_key = os.getenv("GEMINI_API_KEY", "AIzaSymDxwb0KiT5h9bF0ifaA9zPetjRGQMfx_nE")
+# Configure Gemini with API key from environment only
+api_key = os.getenv("GEMINI_API_KEY")
+if not api_key:
+    raise RuntimeError("GEMINI_API_KEY environment variable is required for Gemini AI")
 genai.configure(api_key=api_key)
 
 # Use a single global model instance

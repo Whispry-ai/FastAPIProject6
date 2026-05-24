@@ -3,10 +3,15 @@
 Test CSV export with authentication
 """
 
+import os
 import requests
 import json
 
 BASE_URL = "http://localhost:8001"
+
+TEST_ADMIN_PASSWORD = os.getenv("TEST_ADMIN_PASSWORD")
+if not TEST_ADMIN_PASSWORD:
+    raise RuntimeError("TEST_ADMIN_PASSWORD environment variable is required for admin-auth tests")
 
 def test_csv_export():
     """Test CSV export endpoints with authentication"""
@@ -18,7 +23,7 @@ def test_csv_export():
     try:
         login_data = {
             "username": "ADMIN001",
-            "password": "admin123"  # Default admin password
+            "password": TEST_ADMIN_PASSWORD
         }
         
         response = requests.post(f"{BASE_URL}/user/login", json=login_data)

@@ -7,7 +7,7 @@ services:
     environment:
       POSTGRES_DB: hyperlocal_news
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-Lumora#133AR}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
@@ -42,8 +42,8 @@ services:
   pgadmin:
     image: dpage/pgadmin4:latest
     environment:
-      PGADMIN_DEFAULT_EMAIL: admin@newsplatform.com
-      PGADMIN_DEFAULT_PASSWORD: admin123
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-admin@newsplatform.com}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
       PGADMIN_CONFIG_SERVER_MODE: 'False'
     ports:
       - "5050:80"
@@ -62,7 +62,7 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - DATABASE_URL=postgresql://postgres:${DB_PASSWORD:-Lumora#133AR}@postgres:5432/hyperlocal_news
+      - DATABASE_URL=postgresql://postgres:${DB_PASSWORD}@postgres:5432/hyperlocal_news
       - REDIS_URL=redis://redis:6379/0
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
       - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
@@ -82,7 +82,7 @@ services:
     build: .
     command: celery -A celery_worker worker --loglevel=info
     environment:
-      - DATABASE_URL=postgresql://postgres:${DB_PASSWORD:-Lumora#133AR}@postgres:5432/hyperlocal_news
+      - DATABASE_URL=postgresql://postgres:${DB_PASSWORD}@postgres:5432/hyperlocal_news
       - REDIS_URL=redis://redis:6379/0
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
       - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
@@ -102,7 +102,7 @@ services:
     build: .
     command: celery -A celery_worker beat --loglevel=info
     environment:
-      - DATABASE_URL=postgresql://postgres:${DB_PASSWORD:-Lumora#133AR}@postgres:5432/hyperlocal_news
+      - DATABASE_URL=postgresql://postgres:${DB_PASSWORD}@postgres:5432/hyperlocal_news
       - REDIS_URL=redis://redis:6379/0
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
       - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}

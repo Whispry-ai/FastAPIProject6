@@ -53,10 +53,6 @@ def generate_poll_uid(length: int = 7) -> str:
     """Generate a unique poll UID."""
     return ''.join(random.choices(string.ascii_uppercase + string.digits, k=length))
 
-def generate_otp(length: int = 6) -> str:
-    """Generate a numeric OTP of specified length."""
-    return ''.join(random.choices("0123456789", k=length))
-
 # -----------------------------------------------------------------------------
 # 👤 Username Generators
 # -----------------------------------------------------------------------------
@@ -160,7 +156,7 @@ def generate_short_username(prefix: Optional[str] = None) -> str:
 # -----------------------------------------------------------------------------
 # 🌐 YouTube / Source Utilities
 # -----------------------------------------------------------------------------
-YOUTUBE_API_KEY = os.getenv("YOUTUBE_API_KEY") or "AIzaSyC013xVl56vUztKTHXNeSXawL7b10nFzqo"
+YOUTUBE_API_KEY = os.getenv("YOUTUBE_API_KEY")
 YOUTUBE_SEARCH_URL = "https://www.googleapis.com/youtube/v3/search"
 
 def extract_source_name(url: str) -> str:
@@ -229,34 +225,6 @@ def send_news_notifications(db: Session, news_title: str, news_id: int):
 
     db.add_all(notifications)
     db.commit()
-# ====================================================
-# 🔐 Password Hashing Configuration
-# ====================================================
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
-
-# ====================================================
-# 🎥 YouTube API Configuration
-# ====================================================
-YOUTUBE_API_KEY = os.getenv("YOUTUBE_API_KEY") or "AIzaSyC013xVl56vUztKTHXNeSXawL7b10nFzqo"
-YOUTUBE_SEARCH_URL = "https://www.googleapis.com/youtube/v3/search"
-
-
-# ====================================================
-# 🧠 Common Utility Functions
-# ====================================================
-
-def extract_source_name(url: str) -> str:
-    """
-    Extracts and returns a clean, capitalized source name from a given URL.
-    Example:
-        https://www.bbc.com/news -> "Bbc"
-    """
-    netloc = urlparse(url).netloc
-    domain = netloc.replace("www.", "").split(".")[0]
-    return domain.capitalize()
-
-
 def generate_otp() -> str:
     """
     Generates a random 4-digit OTP as a string.
@@ -265,15 +233,4 @@ def generate_otp() -> str:
     return str(random.randint(1000, 9999))
 
 
-def hash_password(password: str) -> str:
-    """
-    Hashes a plaintext password using bcrypt.
-    """
-    return pwd_context.hash(password)
 
-
-def verify_password(plain_password: str, hashed_password: str) -> bool:
-    """
-    Verifies a plaintext password against its hashed version.
-    """
-    return pwd_context.verify(plain_password, hashed_password)
