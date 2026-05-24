@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Analysis Client</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #4a5568;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+        .ai-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            background: #f8f9fa;
+        }
+        .ai-section h2 {
+            color: #2d3748;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #4a5568;
+        }
+        textarea, input, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #cbd5e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        textarea:focus, input:focus, select:focus {
+            outline: none;
+            border-color: #4299e1;
+            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
+        }
+        textarea {
+            height: 100px;
+            resize: vertical;
+        }
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        button:active {
+            transform: translateY(0);
+        }
+        .result {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 15px;
+            border-left: 4px solid #4299e1;
+        }
+        .result h3 {
+            color: #2d3748;
+            margin-bottom: 10px;
+        }
+        .sentiment-positive { border-left-color: #48bb78; }
+        .sentiment-negative { border-left-color: #f56565; }
+        .sentiment-neutral { border-left-color: #ed8936; }
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #718096;
+        }
+        .error {
+            background: #fed7d7;
+            color: #c53030;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #f56565;
+        }
+        .success {
+            background: #c6f6d5;
+            color: #2f855a;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #48bb78;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #4299e1;
+        }
+        .stat-label {
+            color: #718096;
+            margin-top: 5px;
+        }
+        .emoji {
+            font-size: 1.5em;
+            margin-right: 5px;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #e2e8f0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4299e1, #667eea);
+            transition: width 0.5s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🤖 AI Analysis Client</h1>
+        <p style="text-align: center; color: #718096; margin-bottom: 30px;">
+            Test all AI features: Sentiment Analysis, Fake News Detection, Category Suggestions, and more!
+        </p>
+    </div>
+
+    <div class="container">
+        <div class="ai-section">
+            <h2><span class="emoji">😊</span> Sentiment Analysis</h2>
+            <div class="form-group">
+                <label for="sentiment-text">Text to Analyze:</label>
+                <textarea id="sentiment-text" placeholder="Enter text for sentiment analysis...">This is amazing news about technology innovation!</textarea>
+            </div>
+            <div class="form-group">
+                <label for="sentiment-language">Language:</label>
+                <select id="sentiment-language">
+                    <option value="en">English</option>
+                    <option value="te">Telugu</option>
+                    <option value="hi">Hindi</option>
+                </select>
+            </div>
+            <button onclick="analyzeSentiment()">🔍 Analyze Sentiment</button>
+            <div id="sentiment-result"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="ai-section">
+            <h2><span class="emoji">🔍</span> Fake News Detection</h2>
+            <div class="form-group">
+                <label for="fake-title">News Title:</label>
+                <input type="text" id="fake-title" placeholder="Enter news title..." value="Scientists Discover Revolutionary Breakthrough">
+            </div>
+            <div class="form-group">
+                <label for="fake-content">News Content:</label>
+                <textarea id="fake-content" placeholder="Enter news content...">Researchers at leading universities have announced a major breakthrough in renewable energy technology that could change the world.</textarea>
+            </div>
+            <button onclick="detectFakeNews()">🔍 Detect Fake News</button>
+            <div id="fake-result"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="ai-section">
+            <h2><span class="emoji">📂</span> Category Suggestion</h2>
+            <div class="form-group">
+                <label for="category-text">News Text:</label>
+                <textarea id="category-text" placeholder="Enter news text for category suggestion...">Tech company launches new AI-powered mobile application for healthcare monitoring.</textarea>
+            </div>
+            <button onclick="suggestCategory()">🔍 Suggest Category</button>
+            <div id="category-result"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="ai-section">
+            <h2><span class="emoji">📊</span> Content Analysis</h2>
+            <div class="form-group">
+                <label for="content-analysis-text">Content to Analyze:</label>
+                <textarea id="content-analysis-text" placeholder="Enter content for comprehensive analysis..." style="height: 150px;">Breaking: Local technology startup announces innovative AI solution for healthcare. The new system promises to revolutionize patient care with real-time monitoring and predictive analytics. Company founders, who are local university graduates, have secured significant funding from national investors. The application is expected to launch next month with partnerships from major hospitals.</textarea>
+            </div>
+            <button onclick="analyzeContent()">🔍 Analyze Content</button>
+            <div id="content-result"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-value" id="total-analyses">0</div>
+                <div class="stat-label">Total Analyses</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="sentiment-count">0</div>
+                <div class="stat-label">Sentiment Analyses</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="fake-news-count">0</div>
+                <div class="stat-label">Fake News Checks</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="category-count">0</div>
+                <div class="stat-label">Category Suggestions</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8001';
+        let stats = {
+            total: 0,
+            sentiment: 0,
+            fakeNews: 0,
+            category: 0
+        };
+
+        function updateStats() {
+            document.getElementById('total-analyses').textContent = stats.total;
+            document.getElementById('sentiment-count').textContent = stats.sentiment;
+            document.getElementById('fake-news-count').textContent = stats.fakeNews;
+            document.getElementById('category-count').textContent = stats.category;
+        }
+
+        function showLoading(elementId) {
+            document.getElementById(elementId).innerHTML = '<div class="loading">🤖 AI is thinking...</div>';
+        }
+
+        function showError(elementId, message) {
+            document.getElementById(elementId).innerHTML = `<div class="error">❌ Error: ${message}</div>`;
+        }
+
+        function showResult(elementId, title, content, type = 'success') {
+            const resultClass = type === 'sentiment' ? `sentiment-${content.sentiment || 'neutral'}` : 'success';
+            document.getElementById(elementId).innerHTML = `
+                <div class="result ${resultClass}">
+                    <h3>${title}</h3>
+                    <div>${content}</div>
+                </div>
+            `;
+        }
+
+        async function analyzeSentiment() {
+            const text = document.getElementById('sentiment-text').value;
+            const language = document.getElementById('sentiment-language').value;
+            
+            if (!text.trim()) {
+                showError('sentiment-result', 'Please enter text for analysis');
+                return;
+            }
+
+            showLoading('sentiment-result');
+            stats.total++;
+            stats.sentiment++;
+            updateStats();
+
+            try {
+                const response = await fetch(`${API_BASE}/ai/sentiment-analysis`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text })
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    const sentimentEmoji = {
+                        'positive': '😊',
+                        'negative': '😔',
+                        'neutral': '😐'
+                    };
+                    
+                    showResult('sentiment-result', 
+                        `${sentimentEmoji[result.sentiment || 'neutral']} Sentiment Analysis`,
+                        `<strong>Sentiment:</strong> ${result.sentiment || 'neutral'}<br>
+                         <strong>Confidence:</strong> ${result.confidence || 'N/A'}<br>
+                         <strong>Emotion:</strong> ${result.emotion || 'N/A'}<br>
+                         <strong>Analysis:</strong> ${result.analysis || 'Analysis completed'}`,
+                        'sentiment'
+                    );
+                } else {
+                    showError('sentiment-result', await response.text());
+                }
+            } catch (error) {
+                showError('sentiment-result', error.message);
+            }
+        }
+
+        async function detectFakeNews() {
+            const title = document.getElementById('fake-title').value;
+            const content = document.getElementById('fake-content').value;
+            
+            if (!title.trim() || !content.trim()) {
+                showError('fake-result', 'Please enter both title and content');
+                return;
+            }
+
+            showLoading('fake-result');
+            stats.total++;
+            stats.fakeNews++;
+            updateStats();
+
+            try {
+                const response = await fetch(`${API_BASE}/ai/fake-news-detection`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ title, content })
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    const credibilityEmoji = result.is_fake ? '🚩' : '✅';
+                    
+                    showResult('fake-result', 
+                        `${credibilityEmoji} Fake News Detection`,
+                        `<strong>Result:</strong> ${result.is_fake ? 'LIKELY FAKE' : 'LIKELY REAL'}<br>
+                         <strong>Confidence:</strong> ${result.confidence || 'N/A'}<br>
+                         <strong>Credibility Score:</strong> ${result.credibility_score || 'N/A'}<br>
+                         <strong>Analysis:</strong> ${result.analysis || 'Analysis completed'}`
+                    );
+                } else {
+                    showError('fake-result', await response.text());
+                }
+            } catch (error) {
+                showError('fake-result', error.message);
+            }
+        }
+
+        async function suggestCategory() {
+            const text = document.getElementById('category-text').value;
+            
+            if (!text.trim()) {
+                showError('category-result', 'Please enter text for category suggestion');
+                return;
+            }
+
+            showLoading('category-result');
+            stats.total++;
+            stats.category++;
+            updateStats();
+
+            try {
+                const response = await fetch(`${API_BASE}/ai/category-suggestion`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text })
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    
+                    showResult('category-result', 
+                        '📂 Category Suggestion',
+                        `<strong>Suggested Category:</strong> ${result.suggested_category || 'N/A'}<br>
+                         <strong>Confidence:</strong> ${result.confidence || 'N/A'}<br>
+                         <strong>Alternative Categories:</strong> ${result.alternative_categories ? result.alternative_categories.join(', ') : 'N/A'}<br>
+                         <strong>Reasoning:</strong> ${result.reasoning || 'Analysis completed'}`
+                    );
+                } else {
+                    showError('category-result', await response.text());
+                }
+            } catch (error) {
+                showError('category-result', error.message);
+            }
+        }
+
+        async function analyzeContent() {
+            const text = document.getElementById('content-analysis-text').value;
+            
+            if (!text.trim()) {
+                showError('content-result', 'Please enter content for analysis');
+                return;
+            }
+
+            showLoading('content-result');
+            stats.total++;
+            updateStats();
+
+            try {
+                const response = await fetch(`${API_BASE}/ai/content-analysis`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text })
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    
+                    showResult('content-result', 
+                        '📊 Content Analysis',
+                        `<strong>Summary:</strong> ${result.summary || 'N/A'}<br>
+                         <strong>Key Topics:</strong> ${result.key_topics ? result.key_topics.join(', ') : 'N/A'}<br>
+                         <strong>Sentiment:</strong> ${result.sentiment || 'N/A'}<br>
+                         <strong>Readability:</strong> ${result.readability || 'N/A'}<br>
+                         <strong>Word Count:</strong> ${result.word_count || 'N/A'}<br>
+                         <strong>Language:</strong> ${result.language || 'N/A'}`
+                    );
+                } else {
+                    showError('content-result', await response.text());
+                }
+            } catch (error) {
+                showError('content-result', error.message);
+            }
+        }
+
+        // Initialize
+        updateStats();
+    </script>
+</body>
+</html>
