@@ -11,6 +11,7 @@ env/
 # Environment variables and secrets
 .env
 *.env
+.env_*
 
 # IDE/editor settings
 .idea/
